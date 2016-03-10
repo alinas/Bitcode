@@ -1,21 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include "filter_headers.h"
-
-struct filter {
-    const char *name;
-    int (*fn)(buffer_t *, // float32
-              buffer_t *, // float64
-              buffer_t *, // int8
-              buffer_t *, // uint8
-              buffer_t *, // int16
-              buffer_t *, // uint16
-              buffer_t *, // int32
-              buffer_t *, // uint32
-              buffer_t *, // int64
-              buffer_t *, // uint64
-              buffer_t *); // output
-};
+//#include "filter_headers.h"
+//#include "filters.h"
 
 template<typename T>
 T rand_value() {
@@ -45,9 +29,20 @@ buffer_t make_buffer(int w, int h) {
     return buf;
 }
 
-#include "filters.h"
 
 int main(int argc, char **argv) {
+    unsigned int err_code = 0;
+    if (!__builtin_cpu_supports("avx")) {
+      return err_code;
+    }
+    time_t seed;
+    if (argc > 1) {
+        seed = atoi(argv[1]);
+    }
+    else {
+        seed = time(NULL);
+        srand (seed);
+    }
     const int W = 4096, H = 512;
     // Make some input buffers
     buffer_t bufs[] = {
@@ -63,13 +58,17 @@ int main(int argc, char **argv) {
         make_buffer<uint64_t>(W, H)
     };
 
-    buffer_t out = make_buffer<double>(1, 1);
+    buffer_t out[] = {
+        make_buffer<double>(1, 1),
+        make_buffer<double>(1, 1)
+    };
+    double *out_value[] = { new double, new double };
 
-    double *out_value = (double *)(out.host);
+    //General run:
+    //for (int i = 0; filters[i].fn; i++) {
 
-    for (int i = 0; filters[i].fn; i++) {
+    for (int i = 0; i < 2; i++) {
         filter f = filters[i];
-        printf("Testing %s\n", f.name);
         f.fn(bufs + 0,
              bufs + 1,
              bufs + 2,
@@ -80,14 +79,27 @@ int main(int argc, char **argv) {
              bufs + 7,
              bufs + 8,
              bufs + 9,
-             &out);
-        if (*out_value) printf("Error: %f\n", *out_value);
+             &(out[i]));
+        out_value[i] = (double *)(out[i].host);
+        if (*(out_value[i]) > 0.001){
+          fprintf(stderr, "Code generation error: %f. Seed used %ld\n", *(out_value[i]), seed);
+          err_code = 1;
+          break;
+        }
+    }
+
+    if(!err_code && (*(out_value[0]) != *(out_value[1]))){
+      fprintf(stderr, "Optimization error: %f vs %f. Seed used %ld\n", *(out_value[0]), *(out_value[1]), seed);
+      err_code = 1;
     }
 
     for (int i = 0; i < sizeof(bufs)/sizeof(buffer_t); i++) {
         delete[] bufs[i].host;
     }
-    delete[] out.host;
 
-    return 0;
+    for (int i = 0; i < 2; i++) {
+        delete[] out[i].host;
+    }
+
+    return err_code;
 }
