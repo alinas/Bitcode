@@ -1,5 +1,4 @@
-//#include "filter_headers.h"
-//#include "filters.h"
+#include "filter_test_x86op.h"
 
 template<typename T>
 T rand_value() {
@@ -32,9 +31,11 @@ buffer_t make_buffer(int w, int h) {
 
 int main(int argc, char **argv) {
     unsigned int err_code = 0;
+#if defined(__i386__) || defined(__x86_64__)
     if (!__builtin_cpu_supports("avx")) {
       return err_code;
     }
+#endif
     time_t seed;
     if (argc > 1) {
         seed = atoi(argv[1]);
