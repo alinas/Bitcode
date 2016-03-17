@@ -1,4 +1,4 @@
-#include "filter_test_x86op.h"
+#include "filter_test_op.h"
 
 template<typename T>
 T rand_value() {

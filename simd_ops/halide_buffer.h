@@ -28,21 +28,4 @@ struct halide_filter_metadata_t;
 #ifndef HALIDE_FUNCTION_ATTRS
 #define HALIDE_FUNCTION_ATTRS
 #endif
-#ifndef FILTER_T_DEFINED
-#define FILTER_T_DEFINED
-typedef struct filter {
-    const char *name;
-    int (*fn)(buffer_t *, // float32
-              buffer_t *, // float64
-              buffer_t *, // int8
-              buffer_t *, // uint8
-              buffer_t *, // int16
-              buffer_t *, // uint16
-              buffer_t *, // int32
-              buffer_t *, // uint32
-              buffer_t *, // int64
-              buffer_t *, // uint64
-              buffer_t *); // output
-} filter;
-#endif
 
