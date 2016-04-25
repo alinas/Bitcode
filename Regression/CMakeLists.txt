@@ -1,1 +1,3 @@
-add_subdirectory(vector_widen)
+if(ARCH STREQUAL "x86")
+  add_subdirectory(vector_widen)
+endif()
