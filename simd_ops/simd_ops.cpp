@@ -59,10 +59,8 @@ int main(int argc, char **argv) {
         make_buffer<uint64_t>(W, H)
     };
 
-    int NO = 4;
+    int NO = 2;
     buffer_t out[] = {
-        make_buffer<double>(W, H),
-        make_buffer<double>(W, H),
         make_buffer<double>(W, H),
         make_buffer<double>(W, H)
     };
@@ -86,18 +84,8 @@ int main(int argc, char **argv) {
 
     int err;
     for (int i = 0; i < W*H; i++) {
-       if ((err = out_value[2][i] - out_value[3][i]) > 0.0001) {
+       if ((err = out_value[0][i] - out_value[1][i]) > 0.0001) {
          fprintf(stderr, "Code generation error (%d): %f. Seer used %ld\n", i, err, seed);
-         err_code = 1;
-         break;
-       }
-       if (out_value[0][i] != out_value[2][i]) {
-         fprintf(stderr, "Optimization error on the vectorized filter (%d): %f vs %f. Seer used %ld\n", i, out_value[0][i], out_value[2][i], seed);
-         err_code = 1;
-         break;
-       }
-       if (out_value[1][i] != out_value[3][i]) {
-         fprintf(stderr, "Optimization error on the scalar filter (%d): %f vs %f. Seer used %ld\n", i, out_value[1][i], out_value[3][i], seed);
          err_code = 1;
          break;
        }
