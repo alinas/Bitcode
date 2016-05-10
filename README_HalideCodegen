@@ -23,6 +23,6 @@ This is easier for the JIT to call than a function with an unknown
 (at compile time) argument list.
 
 
-E.g. The unit tests "simd_ops" contain a single function called "unopt_test_op"
+E.g. The unit tests "simd_ops" contain functions called "unopt_test_op" and "unopt_scalar_test_op"
 
 

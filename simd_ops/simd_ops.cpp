@@ -59,16 +59,16 @@ int main(int argc, char **argv) {
         make_buffer<uint64_t>(W, H)
     };
 
+    int NO = 4;
     buffer_t out[] = {
-        make_buffer<double>(1, 1),
-        make_buffer<double>(1, 1)
+        make_buffer<double>(W, H),
+        make_buffer<double>(W, H),
+        make_buffer<double>(W, H),
+        make_buffer<double>(W, H)
     };
-    double *out_value[] = { new double, new double };
+    double *out_value[NO];
 
-    //General run:
-    //for (int i = 0; filters[i].fn; i++) {
-
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < NO; i++) {
         filter f = filters[i];
         f.fn(bufs + 0,
              bufs + 1,
@@ -82,25 +82,35 @@ int main(int argc, char **argv) {
              bufs + 9,
              &(out[i]));
         out_value[i] = (double *)(out[i].host);
-        if (*(out_value[i]) > 0.001){
-          fprintf(stderr, "Code generation error: %f. Seed used %ld\n", *(out_value[i]), seed);
-          err_code = 1;
-          break;
-        }
     }
 
-    if(!err_code && (*(out_value[0]) != *(out_value[1]))){
-      fprintf(stderr, "Optimization error: %f vs %f. Seed used %ld\n", *(out_value[0]), *(out_value[1]), seed);
-      err_code = 1;
+    int err;
+    for (int i = 0; i < W*H; i++) {
+       if ((err = out_value[2][i] - out_value[3][i]) > 0.0001) {
+         fprintf(stderr, "Code generation error (%d): %f. Seer used %ld\n", i, err, seed);
+         err_code = 1;
+         break;
+       }
+       if (out_value[0][i] != out_value[2][i]) {
+         fprintf(stderr, "Optimization error on the vectorized filter (%d): %f vs %f. Seer used %ld\n", i, out_value[0][i], out_value[2][i], seed);
+         err_code = 1;
+         break;
+       }
+       if (out_value[1][i] != out_value[3][i]) {
+         fprintf(stderr, "Optimization error on the scalar filter (%d): %f vs %f. Seer used %ld\n", i, out_value[1][i], out_value[3][i], seed);
+         err_code = 1;
+         break;
+       }
     }
 
     for (int i = 0; i < sizeof(bufs)/sizeof(buffer_t); i++) {
         delete[] bufs[i].host;
     }
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < NO; i++) {
         delete[] out[i].host;
     }
 
     return err_code;
 }
+
