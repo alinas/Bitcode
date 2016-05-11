@@ -31,7 +31,7 @@ buffer_t make_buffer(int w, int h) {
 
 int main(int argc, char **argv) {
     unsigned int err_code = 0;
-#if !__has_builtin(__builtin_cpu_supports)
+#if (!__has_builtin(__builtin_cpu_supports) && (defined(__i386__) || defined(__x86_64__)))
     return err_code;
 #endif
 #if defined(__i386__) || defined(__x86_64__)
