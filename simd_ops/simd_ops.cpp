@@ -47,7 +47,8 @@ int main(int argc, char **argv) {
         seed = time(NULL);
         srand (seed);
     }
-    const int W = 4096, H = 512;
+    //const int W = 4096, H = 512;
+    const int W = 768, H = 100;
     // Make some input buffers
     buffer_t bufs[] = {
         make_buffer<float>(W, H),
@@ -66,6 +67,8 @@ int main(int argc, char **argv) {
     buffer_t out[] = {
         make_buffer<double>(W, H),
         make_buffer<double>(W, H)
+        //make_buffer<int32_t>(W, H),
+        //make_buffer<int32_t>(W, H)
     };
     double *out_value[NO];
 
@@ -88,7 +91,7 @@ int main(int argc, char **argv) {
     int err;
     for (int i = 0; i < W*H; i++) {
        if ((err = out_value[0][i] - out_value[1][i]) > 0.0001) {
-         fprintf(stderr, "Code generation error (%d): %f. Seer used %ld\n", i, err, seed);
+         fprintf(stderr, "Code generation error (%d): %d. Seer used %ld\n", i, err, seed);
          err_code = 1;
          break;
        }
