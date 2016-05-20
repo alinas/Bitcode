@@ -47,12 +47,10 @@ int main(int argc, char **argv) {
         seed = time(NULL);
         srand (seed);
     }
-    int W = 4096, H = 512;
-    const int extra = 100;
-    W+=extra;
+    int W = 5*256, H = 100;
     // Make some input buffers
     buffer_t bufs[] = {
-        make_buffer<float>(W+W, H),
+        make_buffer<float>(W, H),
         make_buffer<double>(W, H),
         make_buffer<int8_t>(W, H),
         make_buffer<uint8_t>(W, H),
@@ -63,14 +61,12 @@ int main(int argc, char **argv) {
         make_buffer<int64_t>(W, H),
         make_buffer<uint64_t>(W, H)
     };
-    W-=extra;
+    W/=5;
 
     int NO = 2;
     buffer_t out[] = {
         make_buffer<double>(W, H),
         make_buffer<double>(W, H)
-        //make_buffer<int32_t>(W, H),
-        //make_buffer<int32_t>(W, H)
     };
     double *out_value[NO];
 
