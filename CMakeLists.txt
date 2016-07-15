@@ -1,6 +1,7 @@
 if(NOT TEST_SUITE_BENCHMARKING_ONLY)
-  add_subdirectory(Regression)
+  llvm_add_subdirectories(Regression)
   if(ARCH STREQUAL "x86")
-    add_subdirectory(simd_ops)
+    llvm_add_subdirectories(simd_ops)
   endif()
 endif()
+
